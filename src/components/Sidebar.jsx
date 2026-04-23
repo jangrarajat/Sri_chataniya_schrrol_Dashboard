@@ -38,11 +38,11 @@ const Sidebar = () => {
       label: "Gallery Management",
       icon: Image,
     },
-    {
-      path: "/content",
-      label: "Website Content",
-      icon: Settings,
-    },
+    // {
+    //   path: "/content",
+    //   label: "Website Content",
+    //   icon: Settings,
+    // },
   ];
 
   const handleLogout = () => {
@@ -66,7 +66,7 @@ const Sidebar = () => {
       <div
         className={`fixed left-0 top-0 h-screen w-64 bg-sidebar border-r border-sidebar-border transition-transform duration-300 z-40 lg:translate-x-0 ${
           isOpen ? "translate-x-0" : "-translate-x-full"
-        }`}
+        }`} 
       >
         {/* Logo */}
         <div className="p-6 border-b border-sidebar-border">

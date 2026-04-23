@@ -3,7 +3,7 @@ import Sidebar from "./Sidebar";
 
 const AdminLayout = ({ children, title }) => {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-white">
       <Sidebar />
       <div className="lg:ml-64">
         {title && (

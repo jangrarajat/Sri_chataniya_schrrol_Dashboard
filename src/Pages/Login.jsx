@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Eye, EyeOff, Lock, Mail } from "lucide-react";
+import { loginAPI } from "../api/api";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -16,16 +17,16 @@ const Login = () => {
     setIsLoading(true);
 
     try {
-      // Simulate API call
-      if (email && password.length >= 6) {
-        // Store token in localStorage
-        localStorage.setItem("adminToken", JSON.stringify({ email }));
+      const response = await loginAPI(email, password);
+      if (response.success) {
+        localStorage.setItem("adminToken", response.token);
+        localStorage.setItem("adminEmail", response.user.email);
         navigate("/dashboard");
       } else {
-        setError("Invalid email or password");
+        setError(response.message || "Invalid email or password");
       }
     } catch (err) {
-      setError("Login failed. Please try again.");
+      setError(err.message || "Login failed. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -34,7 +35,6 @@ const Login = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-sidebar-background flex items-center justify-center px-4">
       <div className="w-full max-w-md">
-        {/* Logo Section */}
         <div className="text-center mb-8">
           <div className="inline-block mb-4">
             <div className="w-16 h-16 bg-primary rounded-xl flex items-center justify-center">
@@ -47,10 +47,8 @@ const Login = () => {
           <p className="text-sidebar-foreground/60">Admin Panel Login</p>
         </div>
 
-        {/* Login Form */}
         <div className="bg-card border border-border rounded-lg shadow-xl p-8">
           <form onSubmit={handleLogin} className="space-y-6">
-            {/* Email Field */}
             <div>
               <label className="block text-sm font-medium text-foreground mb-2">
                 Email Address
@@ -62,12 +60,12 @@ const Login = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="admin@school.com"
+                  required
                   className="w-full pl-10 pr-4 py-2 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-foreground placeholder:text-sidebar-foreground/40 transition-all"
                 />
               </div>
             </div>
 
-            {/* Password Field */}
             <div>
               <label className="block text-sm font-medium text-foreground mb-2">
                 Password
@@ -79,6 +77,7 @@ const Login = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
+                  required
                   className="w-full pl-10 pr-10 py-2 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-foreground placeholder:text-sidebar-foreground/40 transition-all"
                 />
                 <button
@@ -91,14 +90,12 @@ const Login = () => {
               </div>
             </div>
 
-            {/* Error Message */}
             {error && (
               <div className="bg-red-500/10 border border-red-500/30 text-red-400 px-4 py-3 rounded-lg text-sm">
                 {error}
               </div>
             )}
 
-            {/* Login Button */}
             <button
               type="submit"
               disabled={isLoading}
@@ -108,21 +105,19 @@ const Login = () => {
             </button>
           </form>
 
-          {/* Demo Credentials */}
           <div className="mt-6 p-4 bg-sidebar-background rounded-lg border border-border">
             <p className="text-xs text-sidebar-foreground/60 font-medium mb-2">
-              Demo Credentials:
+              Demo Credentials (Check .env):
             </p>
             <p className="text-xs text-sidebar-foreground/50">
-              Email: admin@school.com
+              Email: admin@gmail.com
             </p>
             <p className="text-xs text-sidebar-foreground/50">
-              Password: password123
+              Password: 123456
             </p>
           </div>
         </div>
 
-        {/* Footer */}
         <p className="text-center text-sidebar-foreground/50 text-sm mt-8">
           Sri Chaitanya Academy Kotputli
         </p>

@@ -1,5 +1,7 @@
-import { Users, Mail, FileText, Send, TrendingUp } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Users, Mail, FileText, TrendingUp, Send } from "lucide-react";
 import AdminLayout from "../components/AdminLayout.jsx";
+import { getDashboardStats, getAdmissionForms, getContacts } from "../api/api";
 import {
   BarChart,
   Bar,
@@ -14,68 +16,109 @@ import {
 } from "recharts";
 
 const Dashboard = () => {
-  // Sample data for charts
-  const visitorsData = [
-    { month: "Jan", visitors: 4000 },
-    { month: "Feb", visitors: 3000 },
-    { month: "Mar", visitors: 2000 },
-    { month: "Apr", visitors: 2780 },
-    { month: "May", visitors: 1890 },
-    { month: "Jun", visitors: 2390 },
-  ];
+  const [stats, setStats] = useState({
+    totalEnquiries: 0,
+    totalSubmissions: 0,
+    totalAdmissions: 0,
+    pendingEnquiries: 0,
+    newAdmissions: 0,
+    contactedAdmissions: 0,
+    processingAdmissions: 0,
+  });
+  const [loading, setLoading] = useState(true);
+  const [weeklyData, setWeeklyData] = useState([]);
 
-  const inquiriesData = [
-    { day: "Mon", enquiries: 24, admissions: 15 },
-    { day: "Tue", enquiries: 18, admissions: 12 },
-    { day: "Wed", enquiries: 32, admissions: 22 },
-    { day: "Thu", enquiries: 28, admissions: 20 },
-    { day: "Fri", enquiries: 35, admissions: 25 },
-    { day: "Sat", enquiries: 22, admissions: 18 },
-  ];
+  useEffect(() => {
+    fetchDashboardData();
+  }, []);
 
-  const stats = [
-    {
-      label: "Total Website Visitors",
-      value: "12,450",
-      icon: Users,
-      color: "bg-blue-500/10 text-blue-400",
-      trend: "+12% from last month",
-    },
+  const fetchDashboardData = async () => {
+    try {
+      setLoading(true);
+      const [formsData, contactsData] = await Promise.all([
+        getAdmissionForms(),
+        getContacts(),
+      ]);
+
+      const forms = formsData.data || [];
+      const contacts = contactsData.data || [];
+
+      // Stats
+      setStats({
+        totalEnquiries: contacts.length,
+        totalSubmissions: contacts.length,
+        totalAdmissions: forms.length,
+        pendingEnquiries: contacts.filter(c => c.status === 'New Inquiry').length,
+        newAdmissions: forms.filter(f => f.status === 'New Inquiry').length,
+        contactedAdmissions: forms.filter(f => f.status === 'Approved').length,
+        processingAdmissions: forms.filter(f => f.status === 'In Progress').length,
+      });
+
+      // Weekly data (last 7 days)
+      const last7Days = [...Array(7)].map((_, i) => {
+        const date = new Date();
+        date.setDate(date.getDate() - i);
+        return date.toISOString().split('T')[0];
+      }).reverse();
+
+      const weekly = last7Days.map(date => ({
+        day: new Date(date).toLocaleDateString('en-US', { weekday: 'short' }),
+        enquiries: contacts.filter(c => c.createdAt?.split('T')[0] === date).length,
+        admissions: forms.filter(f => f.createdAt?.split('T')[0] === date).length,
+      }));
+      setWeeklyData(weekly);
+    } catch (error) {
+      console.error("Error fetching dashboard data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const statCards = [
     {
       label: "Contact Enquiries",
-      value: "243",
+      value: stats.totalEnquiries,
       icon: Mail,
       color: "bg-purple-500/10 text-purple-400",
-      trend: "+8% from last month",
+      trend: "Total enquiries received",
     },
     {
       label: "Contact Submissions",
-      value: "89",
+      value: stats.totalSubmissions,
       icon: Send,
       color: "bg-green-500/10 text-green-400",
-      trend: "+5% from last month",
+      trend: "Total contact forms",
     },
     {
       label: "Admission Forms",
-      value: "156",
+      value: stats.totalAdmissions,
       icon: FileText,
       color: "bg-orange-500/10 text-orange-400",
-      trend: "+22% from last month",
+      trend: "Total applications",
     },
   ];
+
+  if (loading) {
+    return (
+      <AdminLayout title="Dashboard">
+        <div className="flex items-center justify-center h-96">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+            <p className="mt-4 text-sidebar-foreground/60">Loading dashboard...</p>
+          </div>
+        </div>
+      </AdminLayout>
+    );
+  }
 
   return (
     <AdminLayout title="Dashboard">
       <div className="space-y-8">
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {stats.map((stat, index) => {
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {statCards.map((stat, index) => {
             const Icon = stat.icon;
             return (
-              <div
-                key={index}
-                className="stat-card group"
-              >
+              <div key={index} className="bg-card border border-border rounded-lg p-6">
                 <div className="flex justify-between items-start mb-4">
                   <div>
                     <p className="text-sidebar-foreground/60 text-sm font-medium">
@@ -89,115 +132,60 @@ const Dashboard = () => {
                     <Icon size={24} />
                   </div>
                 </div>
-                <p className="text-xs text-green-400">{stat.trend}</p>
+                <p className="text-xs text-sidebar-foreground/50">{stat.trend}</p>
               </div>
             );
           })}
         </div>
 
-        {/* Charts Section */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Visitors Chart */}
-          <div className="bg-card border border-border rounded-lg p-6 shadow-sm">
+          <div className="bg-card border border-border rounded-lg p-6">
             <div className="mb-6">
               <h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
                 <TrendingUp size={20} className="text-primary" />
-                Monthly Website Visitors
+                Weekly Activity
               </h3>
-              <p className="text-sm text-sidebar-foreground/60 mt-1">
-                Visitor trends over the last 6 months
-              </p>
             </div>
             <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={visitorsData}>
+              <BarChart data={weeklyData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                <XAxis stroke="hsl(var(--sidebar-foreground)/0.5)" />
+                <XAxis dataKey="day" stroke="hsl(var(--sidebar-foreground)/0.5)" />
                 <YAxis stroke="hsl(var(--sidebar-foreground)/0.5)" />
                 <Tooltip
                   contentStyle={{
                     backgroundColor: "hsl(var(--card))",
                     border: "1px solid hsl(var(--border))",
-                    borderRadius: "0.5rem",
                   }}
-                  labelStyle={{ color: "hsl(var(--foreground))" }}
                 />
                 <Legend />
-                <Line
-                  type="monotone"
-                  dataKey="visitors"
-                  stroke="hsl(var(--primary))"
-                  strokeWidth={2}
-                  dot={{ fill: "hsl(var(--primary))", r: 5 }}
-                  activeDot={{ r: 7 }}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-
-          {/* Inquiries vs Admissions Chart */}
-          <div className="bg-card border border-border rounded-lg p-6 shadow-sm">
-            <div className="mb-6">
-              <h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
-                <TrendingUp size={20} className="text-primary" />
-                Weekly Inquiries & Admissions
-              </h3>
-              <p className="text-sm text-sidebar-foreground/60 mt-1">
-                Comparison of contact enquiries and admission forms
-              </p>
-            </div>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={inquiriesData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                <XAxis stroke="hsl(var(--sidebar-foreground)/0.5)" />
-                <YAxis stroke="hsl(var(--sidebar-foreground)/0.5)" />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: "hsl(var(--card))",
-                    border: "1px solid hsl(var(--border))",
-                    borderRadius: "0.5rem",
-                  }}
-                  labelStyle={{ color: "hsl(var(--foreground))" }}
-                />
-                <Legend />
-                <Bar
-                  dataKey="enquiries"
-                  fill="hsl(var(--primary))"
-                  radius={[8, 8, 0, 0]}
-                />
-                <Bar
-                  dataKey="admissions"
-                  fill="hsl(var(--sidebar-accent-foreground))"
-                  radius={[8, 8, 0, 0]}
-                />
+                <Bar dataKey="enquiries" fill="hsl(var(--primary))" radius={[8, 8, 0, 0]} />
+                <Bar dataKey="admissions" fill="hsl(var(--sidebar-accent-foreground))" radius={[8, 8, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
-        </div>
 
-        {/* Quick Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20 rounded-lg p-6">
-            <p className="text-sm text-sidebar-foreground/60 font-medium mb-2">
-              Today's Visitors
-            </p>
-            <p className="text-3xl font-bold text-primary">342</p>
-            <p className="text-xs text-primary/60 mt-2">+15% compared to yesterday</p>
-          </div>
-
-          <div className="bg-gradient-to-br from-green-500/10 to-green-500/5 border border-green-500/20 rounded-lg p-6">
-            <p className="text-sm text-sidebar-foreground/60 font-medium mb-2">
-              Pending Enquiries
-            </p>
-            <p className="text-3xl font-bold text-green-400">28</p>
-            <p className="text-xs text-green-400/60 mt-2">Awaiting response</p>
-          </div>
-
-          <div className="bg-gradient-to-br from-orange-500/10 to-orange-500/5 border border-orange-500/20 rounded-lg p-6">
-            <p className="text-sm text-sidebar-foreground/60 font-medium mb-2">
-              New Admissions
-            </p>
-            <p className="text-3xl font-bold text-orange-400">12</p>
-            <p className="text-xs text-orange-400/60 mt-2">This week</p>
+          <div className="bg-card border border-border rounded-lg p-6">
+            <div className="mb-6">
+              <h3 className="text-lg font-semibold text-foreground">Quick Stats</h3>
+            </div>
+            <div className="space-y-4">
+              <div className="flex justify-between items-center p-3 bg-sidebar-background rounded-lg">
+                <span className="text-sidebar-foreground/70">New Admissions</span>
+                <span className="text-2xl font-bold text-blue-400">{stats.newAdmissions}</span>
+              </div>
+              <div className="flex justify-between items-center p-3 bg-sidebar-background rounded-lg">
+                <span className="text-sidebar-foreground/70">Approved/Contacted</span>
+                <span className="text-2xl font-bold text-green-400">{stats.contactedAdmissions}</span>
+              </div>
+              <div className="flex justify-between items-center p-3 bg-sidebar-background rounded-lg">
+                <span className="text-sidebar-foreground/70">In Progress</span>
+                <span className="text-2xl font-bold text-orange-400">{stats.processingAdmissions}</span>
+              </div>
+              <div className="flex justify-between items-center p-3 bg-sidebar-background rounded-lg">
+                <span className="text-sidebar-foreground/70">Pending Enquiries</span>
+                <span className="text-2xl font-bold text-purple-400">{stats.pendingEnquiries}</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
