@@ -64,7 +64,7 @@ const Sidebar = () => {
 
       {/* Sidebar */}
       <div
-        className={`fixed left-0 top-0 h-screen w-64 bg-sidebar border-r border-sidebar-border transition-transform duration-300 z-40 lg:translate-x-0 ${
+        className={`fixed left-0 top-0 h-screen w-64 bg-red-600 border-r border-sidebar-border transition-transform duration-300 z-40 lg:translate-x-0 ${
           isOpen ? "translate-x-0" : "-translate-x-full"
         }`} 
       >
@@ -86,7 +86,7 @@ const Sidebar = () => {
                 onClick={() => setIsOpen(false)}
                 className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
                   active
-                    ? "bg-sidebar-accent text-primary font-medium"
+                    ? "bg-red-400 text-primary font-medium"
                     : "text-sidebar-foreground hover:bg-sidebar-accent/50"
                 }`}
               >

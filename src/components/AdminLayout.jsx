@@ -7,7 +7,7 @@ const AdminLayout = ({ children, title }) => {
       <Sidebar />
       <div className="lg:ml-64">
         {title && (
-          <div className="border-b border-border bg-card sticky top-0 z-10">
+          <div className="border-b border-border bg-red-600 sticky top-0 z-10">
             <div className="px-6 py-4">
               <h1 className="text-3xl font-bold text-foreground">{title}</h1>
             </div>

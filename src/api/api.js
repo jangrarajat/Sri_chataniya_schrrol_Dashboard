@@ -1,5 +1,5 @@
 // API Base URL
-const API_BASE_URL = 'http://localhost:5000/api';
+const API_BASE_URL = 'https://sri-chataniya-schrrol-server.onrender.com/api';
 
 // Helper function to get token
 const getToken = () => localStorage.getItem('adminToken');
