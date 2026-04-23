@@ -1,0 +1,9 @@
+export { default as Login } from './Login.jsx';
+export { default as Dashboard } from './Dashboard.jsx';
+export { default as Analytics } from './Analytics.jsx';
+export { default as Enquiries } from './Enquiries.jsx';
+export { default as Admissions } from './Admissions.jsx';
+export { default as Gallery } from './Gallery.jsx';
+export { default as Content } from './Content.jsx';
+export { default as Settings } from './Settings.jsx';
+export { default as NotFound } from './NotFound.jsx';

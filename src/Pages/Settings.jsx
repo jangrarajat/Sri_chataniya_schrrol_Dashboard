@@ -1,5 +1,5 @@
-import AdminLayout from "../components/AdminLayout";
-import PagePlaceholder from "../components/PagePlaceholder";
+import AdminLayout from "../components/AdminLayout.jsx";
+import PagePlaceholder from "../components/PagePlaceholder.jsx";
 
 const Settings = () => {
   return (

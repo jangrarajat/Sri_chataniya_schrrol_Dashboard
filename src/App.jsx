@@ -1,16 +1,7 @@
 import "./global.css";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import Login from "./pages/Login";
-import Dashboard from "./pages/Dashboard";
-import Analytics from "./pages/Analytics";
-import Enquiries from "./pages/Enquiries";
-import Admissions from "./pages/Admissions";
-import Gallery from "./pages/Gallery";
-import Content from "./pages/Content";
-import Settings from "./pages/Settings";
-import ProtectedRoute from "./components/ProtectedRoute";
-import NotFound from "./pages/NotFound";
-
+import { Login, Dashboard, Analytics, Enquiries, Admissions, Gallery, Content, Settings, NotFound } from "./pages";
+import { ProtectedRoute } from "./components";
 // Apply dark mode on app load
 if (!document.documentElement.classList.contains("dark")) {
   document.documentElement.classList.add("dark");

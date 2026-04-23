@@ -1,5 +1,5 @@
 import { useState } from "react";
-import AdminLayout from "../components/AdminLayout";
+import AdminLayout from "../components/AdminLayout.jsx";
 import { Mail, Phone, MessageCircle, Send, Search, Eye } from "lucide-react";
 
 const Enquiries = () => {

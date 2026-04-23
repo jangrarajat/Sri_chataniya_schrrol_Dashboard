@@ -1,5 +1,5 @@
 import { useState } from "react";
-import AdminLayout from "../components/AdminLayout";
+import AdminLayout from "../components/AdminLayout.jsx";
 import { Phone, Eye, CheckCircle, Search, User } from "lucide-react";
 
 const Admissions = () => {

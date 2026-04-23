@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import AdminLayout from "../components/AdminLayout";
+import AdminLayout from "../components/AdminLayout.jsx";
 import {
   Upload,
   Image as ImageIcon,
