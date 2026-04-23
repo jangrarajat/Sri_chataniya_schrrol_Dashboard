@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import AdminLayout from "../components/AdminLayout.jsx";
 import { Phone, Eye, CheckCircle, Search, User, RefreshCw, Trash2, X } from "lucide-react";
-import { getAdmissionForms, updateAdmissionStatus, deleteAdmissionForm } from "../api/api";
+import { getAdmissionForms, updateAdmissionStatus, deleteAdmissionForm } from "../api/api.js";
 
 const Admissions = () => {
   const [admissions, setAdmissions] = useState([]);

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import AdminLayout from "../components/AdminLayout.jsx";
 import { Mail, Phone, Send, Search, Eye, RefreshCw } from "lucide-react";
-import { getContacts, deleteContact } from "../api/api";
+import { getContacts, deleteContact } from "../api/api.js";
 
 const Enquiries = () => {
   const [enquiries, setEnquiries] = useState([]);

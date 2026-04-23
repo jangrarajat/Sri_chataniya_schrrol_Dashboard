@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Users, Mail, FileText, TrendingUp, Send } from "lucide-react";
 import AdminLayout from "../components/AdminLayout.jsx";
-import { getDashboardStats, getAdmissionForms, getContacts } from "../api/api";
+import { getDashboardStats, getAdmissionForms, getContacts } from "../api/api.js";
 import {
   BarChart,
   Bar,

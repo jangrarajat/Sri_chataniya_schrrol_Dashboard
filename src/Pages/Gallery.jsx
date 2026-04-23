@@ -4,7 +4,7 @@ import {
   Upload, Image as ImageIcon, Trash2, X, Grid, List, Search, Plus,
   Eye, ChevronLeft, ChevronRight, FolderOpen, Loader2
 } from 'lucide-react';
-import { getImages, uploadImage, deleteImage } from "../api/api";
+import { getImages, uploadImage, deleteImage } from "../api/api.js";
 
 const Gallery = () => {
   const [images, setImages] = useState([]);
